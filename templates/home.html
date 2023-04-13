@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Werbeliga Tabelle</title>
+</head>
+
+<body>
+    <h1 style="text-align: center;">Werbeliga</h1>
+    <div id="contentWrapper">
+        <div id="tableWrapper">
+            <table>
+                <tr>
+                    <th>Platz</th>
+                    <th></th>
+                    <th class="leftAlign">Team</th>
+                    <th>Spiele</th>
+                    <th>S</th>
+                    <th>U</th>
+                    <th>N</th>
+                    <th>Tore</th>
+                    <th>Diff.</th>
+                    <th>Punkte</th>
+                    <th>Letzen 5</th>
+
+                </tr>
+                {% for team in teams %}
+                <tr>
+                    <td>{{ team.position }}</td>
+                    <td class="leftAlign" id="teamLogo"><img style="max-height: 25px; max-width: 25px;"
+                            src="{{team.logoURL}}"></td>
+                    <td class="leftAlign" id="teamName">{{ team.name }}</td>
+                    <td>{{ team.getNumberOfGames() }}</td>
+                    <td>{{ team.wins }}</td>
+                    <td>{{ team.draws }}</td>
+                    <td>{{ team.losses }}</td>
+                    <td>{{ team.goals }}:{{ team.goalsAgainst }}</td>
+                    <td>{{ team.getGoalDifference() }}</td>
+                    <td style="font-weight: bold;">{{ team.points }}</td>
+                    <td id="last5">
+                        {% for game in team.last5 %}
+                        {% if game == "W" %}
+                        <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="none" fill-rule="evenodd">
+                                <circle fill="#3AA757" cx="8" cy="8" r="8" />
+                                <path fill="#FFF" fill-rule="nonzero"
+                                    d="M6.4 9.76 4.32 7.68 3.2 8.8 6.4 12l6.4-6.4-1.12-1.12z" />
+                            </g>
+                        </svg>
+                        {% elif game == "D" %}
+                        <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="none" fill-rule="evenodd">
+                                <circle fill="#9AA0A6" cx="8" cy="8" r="8" />
+                                <path fill="#FFF" d="M5 7h6v2H5z" />
+                            </g>
+                        </svg>
+                        {% elif game == "L" %}
+                        <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="none" fill-rule="evenodd">
+                                <circle fill="#EA4335" cx="8" cy="8" r="8" />
+                                <path fill="#FFF"
+                                    d="M10.263 11.394 8 9.131l-2.263 2.263-1.131-1.131L6.869 8 4.606 5.737l1.131-1.131L8 6.869l2.263-2.263 1.131 1.131L9.131 8l2.263 2.263z" />
+                            </g>
+                        </svg>
+                        {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div style="padding-top: 30px;">
+            <div>
+                <h3>Legende</h3>
+                <p><svg style="padding-right:8px"width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="none" fill-rule="evenodd">
+                            <circle fill="#3AA757" cx="8" cy="8" r="8" />
+                            <path fill="#FFF" fill-rule="nonzero"
+                                d="M6.4 9.76 4.32 7.68 3.2 8.8 6.4 12l6.4-6.4-1.12-1.12z" />
+                        </g>
+                    </svg> Sieg</p>
+                <p><svg style="padding-right:8px"width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="none" fill-rule="evenodd">
+                            <circle fill="#9AA0A6" cx="8" cy="8" r="8" />
+                            <path fill="#FFF" d="M5 7h6v2H5z" />
+                        </g>
+                    </svg> Unentschieden</p>
+                <p><svg style="padding-right:8px"width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="none" fill-rule="evenodd">
+                            <circle fill="#EA4335" cx="8" cy="8" r="8" />
+                            <path fill="#FFF"
+                                d="M10.263 11.394 8 9.131l-2.263 2.263-1.131-1.131L6.869 8 4.606 5.737l1.131-1.131L8 6.869l2.263-2.263 1.131 1.131L9.131 8l2.263 2.263z" />
+                        </g>
+                    </svg> Niederlage</p>
+            </div>
+        </div>
+
+</body>
+
+</html>
+
+<style>
+    body {
+        background: #202124;
+        color: #bdc1c6;
+        font-family: arial, sans-serif;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        overflow: scroll;
+    }
+
+    th,
+    td {
+        text-align: center;
+        padding: 8px 4px;
+        width: min-content;
+    }
+
+    .leftAlign {
+        text-align: left;
+    }
+
+    #teamName,
+    #teamLogo {
+        text-align: left;
+    }
+
+    #last5 {
+        white-space: nowrap;
+    }
+
+    #contentWrapper {
+        margin: 0 auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #363636
+    }
+
+    @media only screen and (min-width: 750px) {
+        table {
+            overflow: scroll;
+        }
+    }
+
+    @media only screen and (min-width: 1200px) {
+        #contentWrapper {
+            width: 70%;
+        }
+    }
+</style>
