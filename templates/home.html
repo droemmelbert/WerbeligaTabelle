@@ -28,14 +28,15 @@
                 <tr>
                     <td>{{ team.position }}</td>
                     <td class="leftAlign" id="teamLogo"><img style="max-height: 25px; max-width: 25px;"
-                            src="{{team.logoURL}}"></td>
+                            src="{{url_for('static', filename=team.logoURL)}}
+                            "></td>
                     <td class="leftAlign" id="teamName">{{ team.name }}</td>
-                    <td>{{ team.getNumberOfGames() }}</td>
+                    <td>{{ team.games }}</td>
                     <td>{{ team.wins }}</td>
                     <td>{{ team.draws }}</td>
                     <td>{{ team.losses }}</td>
-                    <td>{{ team.goals }}:{{ team.goalsAgainst }}</td>
-                    <td>{{ team.getGoalDifference() }}</td>
+                    <td>{{ team.goals_scored }}:{{ team.goals_against }}</td>
+                    <td>{{ team.goal_difference }}</td>
                     <td style="font-weight: bold;">{{ team.points }}</td>
                     <td id="last5">
                         {% for game in team.last5 %}
