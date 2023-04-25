@@ -10,7 +10,7 @@ werbeligaURL = 'http://www.werbeliga.de/de/Spielplan,%20Tabelle%20&%20Torsch%C3%
     '?season=' + date.today().strftime('%y')
 matchday_values = []
 teams = []
-last_five_gameday_matchups = []
+matchday_html_list = [] # list of tuples (matchday, html)
 
 # get current matchday value
 url = werbeligaURL
@@ -21,59 +21,66 @@ soup = BeautifulSoup(response.content, 'html.parser')
 for option in soup.find_all('select')[1].find_all('option'):
     matchday_values.append(option.get('value'))
 
-# get current matchday value
+# get html for all matchdays
 for value in matchday_values:
-    current_matchday_value = value
-    currentMatchdayHTML = requests.get(
-        url + '&match=' + current_matchday_value)
-    soup = BeautifulSoup(currentMatchdayHTML.content, 'html.parser')
-    # find first
-    if soup.find_all('table')[0].find_all('tr')[1].find_all('td')[3].text.strip().split(' ')[0] != "-":
+    currentHTML = requests.get(url + '&match=' + value)
+    soup = BeautifulSoup(currentHTML.content, 'html.parser')
+    matchday_html_list.append((value,soup))
+
+found_current_matchday = False
+# get current matchday value
+for item in matchday_html_list:
+    if found_current_matchday == False:
+        value = item[0]
+        soup = item[1]
+        current_matchday_value = value
+
+        # find first matchup where result is not "-:-"
+        rows = soup.find_all('table')[0].find_all('tr')
+        for i in range(1, len(rows) - 1):
+            game_score = rows[i].find_all('td')[3].text.strip() # either "- : -" or "1:1"
+            if game_score != "- : -":
+                found_current_matchday = True
+                current_table_html = soup.find_all('table')[1]
+                break
+    else:
         break
 
-# get last 5 games
-for i in range(5):
-    url = f"{werbeligaURL}&match={int(current_matchday_value) - i}"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
 
-    if i == 0:
-        # save current table
-        current_table_html = soup.find_all('table')[1]
-    # save current matchday matchups
-    last_five_gameday_matchups.append(soup.find_all('table')[0])
+def getLastGames(teamName):
+    lastGames = []
 
-
-def getLast5Games(teamName):
-    last5 = []
-
-    for table in last_five_gameday_matchups:
-        rows = table.find_all('tr')
-        for row in rows:
-            tds = row.find_all('td')
-            if len(tds) != 0:
-                matchup = tds[2].text.strip()
-                if matchup:
-                    home_goals, away_goal = tds[3].text.strip().split(':')
-                    home_goals, away_goal = int(home_goals), int(away_goal)
-                    if matchup.split(':')[0].strip() == teamName:
-                        if home_goals > away_goal:
-                            last5.append('W')
-                        elif home_goals < away_goal:
-                            last5.append('L')
-                        elif home_goals == away_goal:
-                            last5.append('D')
-                    elif matchup.split(':')[1].strip() == teamName:
-                        if home_goals > away_goal:
-                            last5.append('L')
-                        elif home_goals < away_goal:
-                            last5.append('W')
-                        elif home_goals == away_goal:
-                            last5.append('D')
-    return last5
+    for matchday_value, html in matchday_html_list:
+        # only get last 5 games
+        if len(lastGames) < 5:
+            rows = html.find_all('table')[0].find_all('tr')
+            for row in rows:
+                tds = row.find_all('td')
+                if len(tds) != 0:
+                    matchup = tds[2].text.strip()
+                    if matchup and tds[3].text.strip() != "- : -":
+                        home_goals, away_goal = tds[3].text.strip().split(':')
+                        home_goals, away_goal = int(home_goals), int(away_goal)
+                        if matchup.split(':')[0].strip() == teamName:
+                            if home_goals > away_goal:
+                                lastGames.append('W')
+                            elif home_goals < away_goal:
+                                lastGames.append('L')
+                            elif home_goals == away_goal:
+                                lastGames.append('D')
+                        elif matchup.split(':')[1].strip() == teamName:
+                            if home_goals > away_goal:
+                                lastGames.append('L')
+                            elif home_goals < away_goal:
+                                lastGames.append('W')
+                            elif home_goals == away_goal:
+                                lastGames.append('D')
+        else:
+            break
+    return lastGames
 
 
-table = []
+team_info = []
 for row in current_table_html.find_all('tr'):
     rowStr = ''
     logoURL = ''
@@ -84,14 +91,14 @@ for row in current_table_html.find_all('tr'):
             logoURL = row.find('img')['src']
     # add row without last semicolon
     if rowStr != '':
-        table.append(rowStr + logoURL)
+        team_info.append(rowStr + logoURL)
 
 
-for line in table:
+for line in team_info:
     data = line.split(';')
     name = data[1]
-    last5 = getLast5Games(name)
-    team = Team(*data, last5)
+    lastGames = getLastGames(name)
+    team = Team(*data, lastGames)
     teams.append(team)
 
 

@@ -13,7 +13,7 @@ def download_logo(url, name):
     return f'{name}.png'
 
 class Team:
-    def __init__(self, position, name, games, wins, draws, losses, goals, goal_difference, points, logoURL, last5):
+    def __init__(self, position, name, games, wins, draws, losses, goals, goal_difference, points, logoURL, lastGames):
         self.name = name
         self.points = points
         self.goals_scored = goals.split(':')[0]
@@ -24,7 +24,7 @@ class Team:
         self.losses = losses
         self.goal_difference = goal_difference
         self.position = position
-        self.last5 = last5
+        self.lastGames = lastGames
         self.logoURL = download_logo(logoURL, name)
 
     def __str__(self):
