@@ -51,8 +51,8 @@ def getLastGames(teamName):
     lastGames = []
 
     for matchday_value, html in matchday_html_list:
-        # only get last 5 games
-        if len(lastGames) < 5:
+        # only get last 10 games
+        if len(lastGames) < 10:
             rows = html.find_all('table')[0].find_all('tr')
             for row in rows:
                 tds = row.find_all('td')
