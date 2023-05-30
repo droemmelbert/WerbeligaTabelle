@@ -40,7 +40,7 @@
                     <td>{{ team.draws }}</td>
                     <td>{{ team.losses }}</td>
                     <td>{{ team.goals_scored }}:{{ team.goals_against }}</td>
-                    <td>{{ team.goal_difference }}</td>
+                    <td>{% if team.goal_difference | int > 0 %}+{% endif %}{{ team.goal_difference }}</td>
                     <td style="font-weight: bold;">{{ team.points }}</td>
                     <td id="lastGames">
                         {% for game in team.lastGames %}
